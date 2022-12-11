@@ -1,0 +1,103 @@
+"""
+It is game where you must guess a number based on clues.
+"""
+
+import random
+
+# we can set digits and guesses as default by setting the values as below
+# num_digits = 3          # how many digit number
+# max_guess = 10          # number of guesses allowed
+
+
+# taking input from user
+num_digits = int(input('Enter the number of digits you would like to guess:- '))
+max_guess = int(input('Enter the number of guesses you need to guess the number in my mind -> '))
+
+
+def main():
+    print(f'''Guessing Game:- detective logic game.
+     I am thinking of a {num_digits}-digit number with no repeated digits.
+     Try to guess what it is. here are some clues:
+     1. Pico  =  one digit is correct but in wrong position
+     2. Fermi =  one digit is correct but in correct position
+     3. Bagels = No digit is correct
+     ''')
+
+    while True:     # main game loop
+
+        # This stores the secret number the player needs to guess:
+        secret_num = get_secret_num()
+
+        print('I have thought up a number')
+        print(f'You have {max_guess} guesses to get it.')
+
+        num_guesses = 1
+        while num_guesses <= max_guess:      # check number of guesses are less than maximum guess allowed
+            guess = ''
+
+            # keep looping until they enter a valid guess:
+            # here guess.isdecimal() will check if user is entering the numbers only, if they enter other than number
+            # loop will exit
+            while len(guess) != num_digits or not guess.isdecimal():
+                print(f'Guess #{num_guesses}:')
+                guess = input('> ')
+
+            # we are sending guess and secret number to match to getClues method
+            clues = get_clues(guess, secret_num)
+            print(clues)
+
+            num_guesses += 1         # increment the number of guesses
+
+            if guess == secret_num:
+                break   # If guess is correct break out of loop
+
+            if num_guesses > max_guess:      # if maximum guess limit is crossed then display the secret number
+                print('You ran out of guesses.')
+                print('The answer was {}.'.format(secret_num))
+
+        # ask player if they want to play again
+        print('Do you want to play again? (yes or no)')
+        if not input('> ').lower().startswith('y'):
+            break
+    print('Thanks for playing!')
+
+
+def get_secret_num():
+    """ Returns a string made up of  num_digits unique random digits"""
+    numbers = list('0123456789')        # create a list of digits 0 to 9
+    random.shuffle(numbers)         # shuffle them into random order
+
+    # get the first num_digits in the list for secret number:
+    secret_num = ''
+    for i in range(num_digits):
+        secret_num += str(numbers[i])
+    return secret_num
+
+
+def get_clues(guess, secret_num):
+    """ returns a string with the pico, fermi, bagels clues for a guess and secret number of pair"""
+    if guess == secret_num:
+        return 'You got it!'
+
+    clues = []
+
+    for i in range(len(guess)):
+        if guess[i] == secret_num[i]:
+            # a correct digit is in the correct place
+            clues.append('Fermi')
+        elif guess[i] in secret_num:
+            # a correct digit in wrong place
+            clues.append('Pico')
+    if len(clues) == 0:
+        return 'Bagels'     # no correct digits at all
+    else:
+        # sort the clues into alphabetical order so their original order don't give information away
+        clues.sort()
+        # make a single string from the list of string clues.
+        return ' '. join(clues)
+
+# if the program is run (instead of imported), run the game:
+
+
+if __name__ == '__main__':
+    main()
